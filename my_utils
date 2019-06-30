@@ -18,6 +18,7 @@ class Log:
                   if log_dir_name is empty, it will be assigned the name of the file that calls this class.
     backup_count: Maximum number of log files saved by day
     """
+
     def __init__(self, log_main_path="/opt/Adward/", log_dir_name="", backup_count=7):
         self.main = log_main_path
         self.name = log_dir_name
@@ -34,13 +35,15 @@ class Log:
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         debug_handler = logging.handlers.TimedRotatingFileHandler(file_path, when="midnight", backupCount=self.count)
-        debug_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))  # 设置格式
+        debug_handler.setFormatter(
+            logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))  # set the format of debug log
         logger.addHandler(debug_handler)  # add handler for debug
         file_path = os.sep.join([dir_path, "error.log"])
         error_handler = logging.handlers.TimedRotatingFileHandler(file_path, when="midnight", backupCount=self.count)
         error_handler.setLevel(logging.ERROR)  # set the lowest log level at ERROR for error.log
         error_handler.setFormatter(
-            logging.Formatter("%(asctime)s - %(levelname)s - %(filename)s[:%(lineno)d] - %(message)s"))  # 设置信息格式
+            logging.Formatter(
+                "%(asctime)s - %(levelname)s - %(filename)s[:%(lineno)d] - %(message)s"))  # set the format of error log
         logger.addHandler(error_handler)  # add handler for error
         return logger
 
@@ -52,6 +55,7 @@ def retry(logger=None, max_retry=3, interval_wait=0, is_break=False):
     :param interval_wait: Waiting seconds between retries
     :param is_break: Errors need to be thrown if still failed after retry, default is False
     """
+
     def do_retry(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -91,7 +95,9 @@ def retry(logger=None, max_retry=3, interval_wait=0, is_break=False):
                                 else:
                                     return
                             continue
+
         return wrapper
+
     return do_retry
 
 
