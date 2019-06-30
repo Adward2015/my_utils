@@ -116,7 +116,7 @@ class MultiThread(threading.Thread):
 def start_multi_thread(queue):
     """
     :param queue: a queue to content each thread
-    you can use list this:
+    you can use like this:
     ##############################################
     import time
 
