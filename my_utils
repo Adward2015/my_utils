@@ -11,6 +11,13 @@ from threading import Event
 
 
 class Log:
+    """
+    Set the path of the log and the number of logs saved by passing in values
+    log_main_path: The main dir path of log
+    log_dir_name: The specific name of the log which contains debug.log and error.log.
+                  if log_dir_name is empty, it will be assigned the name of the file that calls this class.
+    backup_count: Maximum number of log files saved by day
+    """
     def __init__(self, log_main_path="/opt/Adward/", log_dir_name="", backup_count=7):
         self.main = log_main_path
         self.name = log_dir_name
@@ -21,24 +28,30 @@ class Log:
 
     def set_logger(self):
         logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG)  # 设置最低级别的 DeBUG'
+        logger.setLevel(logging.DEBUG)  # set the lowest log level at DEBUG for debug.log
         dir_path = os.sep.join([self.main, self.name])
         file_path = os.sep.join([dir_path, "debug.log"])
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         debug_handler = logging.handlers.TimedRotatingFileHandler(file_path, when="midnight", backupCount=self.count)
         debug_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))  # 设置格式
-        logger.addHandler(debug_handler)  # 添加处理器    rf_handler
+        logger.addHandler(debug_handler)  # add handler for debug
         file_path = os.sep.join([dir_path, "error.log"])
         error_handler = logging.handlers.TimedRotatingFileHandler(file_path, when="midnight", backupCount=self.count)
-        error_handler.setLevel(logging.ERROR)  # 设置日志等级
+        error_handler.setLevel(logging.ERROR)  # set the lowest log level at ERROR for error.log
         error_handler.setFormatter(
             logging.Formatter("%(asctime)s - %(levelname)s - %(filename)s[:%(lineno)d] - %(message)s"))  # 设置信息格式
-        logger.addHandler(error_handler)  # 添加处理器    f_handler
+        logger.addHandler(error_handler)  # add handler for error
         return logger
 
 
 def retry(logger=None, max_retry=3, interval_wait=0, is_break=False):
+    """
+    :param logger: the logger instance
+    :param max_retry: Maximum number of retries, need to be an integer greater than zero
+    :param interval_wait: Waiting seconds between retries
+    :param is_break: Errors need to be thrown if still failed after retry, default is False
+    """
     def do_retry(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
